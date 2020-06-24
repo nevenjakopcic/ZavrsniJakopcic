@@ -2,6 +2,13 @@ plugins {
     id 'java'
 }
 
+group 'hr.tvz.njakopcic'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
 import org.gradle.internal.os.OperatingSystem
 switch (OperatingSystem.current()) {
     case OperatingSystem.LINUX:
@@ -13,13 +20,6 @@ switch (OperatingSystem.current()) {
     case OperatingSystem.WINDOWS:
         project.ext.lwjglNatives = "natives-windows"
         break
-}
-
-group 'hr.tvz.njakopcic'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -42,4 +42,7 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
     implementation "org.joml:joml:1.9.25"
+
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
 }

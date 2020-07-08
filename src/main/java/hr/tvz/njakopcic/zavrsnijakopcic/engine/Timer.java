@@ -1,8 +1,10 @@
 package hr.tvz.njakopcic.zavrsnijakopcic.engine;
 
+import lombok.Getter;
+
 public class Timer {
 
-    private double lastLoopTime;
+    @Getter private double lastLoopTime;
 
     public void init() {
         lastLoopTime = getTime();
@@ -17,9 +19,5 @@ public class Timer {
         float elapsedTime = (float) (time - lastLoopTime); // TODO: could this be a double?
         lastLoopTime = time;
         return elapsedTime;
-    }
-
-    public double getLastLoopTime() {
-        return lastLoopTime;
     }
 }

@@ -13,11 +13,13 @@ import static org.lwjgl.opengl.GL30.*;
 public class Mesh {
     @Getter private final int vaoId;
     private final int posVboId;
+    private final int colorVboId;
     private final int idxVboId;
     @Getter private final int vertexCount;
 
-    public Mesh(float[] positions, int[] indices) {
+    public Mesh(float[] positions, float[] colors, int[] indices) {
         FloatBuffer posBuffer = null;
+        FloatBuffer colorBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
             vertexCount = indices.length;
@@ -33,6 +35,15 @@ public class Mesh {
             glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
+            // color VBO
+            colorVboId = glGenBuffers();
+            colorBuffer = MemoryUtil.memAllocFloat(colors.length);
+            colorBuffer.put(colors).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, colorVboId);
+            glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+
             // index VBO
             idxVboId = glGenBuffers();
             indicesBuffer = MemoryUtil.memAllocInt(indices.length);
@@ -43,12 +54,12 @@ public class Mesh {
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
         } finally {
-            if (posBuffer != null) {
+            if (posBuffer != null)
                 MemoryUtil.memFree(posBuffer);
-            }
-            if (indicesBuffer != null) {
+            if (colorBuffer != null)
+                MemoryUtil.memFree(colorBuffer);
+            if (indicesBuffer != null)
                 MemoryUtil.memFree(indicesBuffer);
-            }
         }
     }
 
@@ -58,6 +69,7 @@ public class Mesh {
         // delete VBOs
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDeleteBuffers(posVboId);
+        glDeleteBuffers(colorVboId);
         glDeleteBuffers(idxVboId);
 
         // delete the VAO

@@ -16,14 +16,17 @@ public class Mesh {
     @Getter private final int vaoId;
     private final List<Integer> vboIdList;
     @Getter private final int vertexCount;
+    private final Texture texture;
 
-    public Mesh(float[] positions, float[] colors, int[] indices) {
+    public Mesh(float[] positions, float[] textCoords, int[] indices, Texture texture) {
         FloatBuffer posBuffer = null;
-        FloatBuffer colorBuffer = null;
+        FloatBuffer textCoordsBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
+            this.texture = texture;
             vertexCount = indices.length;
             vboIdList = new ArrayList<>();
+
             vaoId = glGenVertexArrays();
             glBindVertexArray(vaoId);
 
@@ -40,12 +43,12 @@ public class Mesh {
             // color VBO
             vboId = glGenBuffers();
             vboIdList.add(vboId);
-            colorBuffer = MemoryUtil.memAllocFloat(colors.length);
-            colorBuffer.put(colors).flip();
+            textCoordsBuffer = MemoryUtil.memAllocFloat(textCoords.length);
+            textCoordsBuffer.put(textCoords).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
             glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 
             // index VBO
             vboId = glGenBuffers();
@@ -60,16 +63,21 @@ public class Mesh {
         } finally {
             if (posBuffer != null)
                 MemoryUtil.memFree(posBuffer);
-            if (colorBuffer != null)
-                MemoryUtil.memFree(colorBuffer);
+            if (textCoordsBuffer != null)
+                MemoryUtil.memFree(textCoordsBuffer);
             if (indicesBuffer != null)
                 MemoryUtil.memFree(indicesBuffer);
         }
     }
 
     public void render() {
+        glActiveTexture(GL_TEXTURE0); // activate first texture unit
+        glBindTexture(GL_TEXTURE_2D, texture.getId());
+
+        // draw the mesh
         glBindVertexArray(getVaoId());
         glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+
         glBindVertexArray(0); // restore state
     }
 
@@ -81,6 +89,8 @@ public class Mesh {
         for (int vboId : vboIdList) {
             glDeleteBuffers(vboId);
         }
+
+        texture.cleanup(); // delete the texture
 
         // delete the VAO
         glBindVertexArray(0);

@@ -12,7 +12,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
 
-    private long windowHandle;
+    @Getter         private long windowHandle;
     @Getter         private final String title;
     @Getter         private int width;
     @Getter         private int height;

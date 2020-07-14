@@ -4,6 +4,7 @@ import hr.tvz.njakopcic.zavrsnijakopcic.engine.GameItem;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.Utils;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.Window;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Camera;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Mesh;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.ShaderProgram;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Transformation;
 import org.joml.Matrix4f;
@@ -25,13 +26,15 @@ public class Renderer {
     public void init(Window window) throws Exception {
         // create shader
         shaderProgram = new ShaderProgram();
-        shaderProgram.createVertexShader(Utils.loadResource("/vertex.glsl"));
-        shaderProgram.createFragmentShader(Utils.loadResource("/fragment.glsl"));
+        shaderProgram.createVertexShader(Utils.loadResource("/shaders/vertex.glsl"));
+        shaderProgram.createFragmentShader(Utils.loadResource("/shaders/fragment.glsl"));
         shaderProgram.link();
 
         shaderProgram.createUniform("projectionMatrix");
         shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("textureSampler");
+        shaderProgram.createUniform("color");
+        shaderProgram.createUniform("useColor");
 
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
@@ -58,9 +61,14 @@ public class Renderer {
         shaderProgram.setUniform("textureSampler", 0);
         // render GameItems
         for (GameItem gameItem : gameItems) {
+            Mesh mesh = gameItem.getMesh();
+            // set model view matrix
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-            gameItem.getMesh().render();
+            // render mesh
+            shaderProgram.setUniform("color", mesh.getColor());
+            shaderProgram.setUniform("useColor", mesh.isTextured() ? 0 : 1);
+            mesh.render();
         }
 
         shaderProgram.unbind();

@@ -4,12 +4,10 @@ import hr.tvz.njakopcic.zavrsnijakopcic.engine.GameItem;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.IGameLogic;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.MouseInput;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.Window;
-import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Camera;
-import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Mesh;
-import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.OBJLoader;
-import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Texture;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -22,6 +20,8 @@ public class DummyGame implements IGameLogic {
     private final Renderer renderer;
     private final Camera camera;
     private GameItem[] gameItems;
+    private Vector3f ambientLight;
+    private PointLight pointLight;
 
     public DummyGame() {
         renderer = new Renderer();
@@ -33,28 +33,37 @@ public class DummyGame implements IGameLogic {
     public void init(Window window) throws Exception {
         renderer.init(window);
 
+        float reflectance = 1f;
+
         Mesh grassMesh = OBJLoader.loadMesh("/models/cube.obj");
-        grassMesh.setTexture(new Texture("textures/grassblock.png"));
+        Texture grassTexture = new Texture("textures/grassblock.png");
+        Material grassMaterial = new Material(grassTexture, reflectance);
+        grassMesh.setMaterial(grassMaterial);
+
+        GameItem gameItem = new GameItem(grassMesh);
+        gameItem.setScale(0.25f);
+        gameItem.setPosition(0, 0, -2);
+
 
         Mesh bunnyMesh = OBJLoader.loadMesh("/models/bunny.obj");
-
-        GameItem gameItem1 = new GameItem(grassMesh);
-        gameItem1.setScale(0.25f);
-        gameItem1.setPosition(0, 0, -2);
-        GameItem gameItem2 = new GameItem(grassMesh);
-        gameItem2.setScale(0.25f);
-        gameItem2.setPosition(0.5f, 0.5f, -2);
-        GameItem gameItem3 = new GameItem(grassMesh);
-        gameItem3.setScale(0.25f);
-        gameItem3.setPosition(0, 0, -2.5f);
-        GameItem gameItem4 = new GameItem(grassMesh);
-        gameItem4.setScale(0.25f);
-        gameItem4.setPosition(0.5f, 0, -2.5f);
+        Vector4f bunnyColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        Material bunnyMaterial = new Material(bunnyColor, reflectance);
+        bunnyMesh.setMaterial(bunnyMaterial);
 
         GameItem bunnyItem = new GameItem(bunnyMesh);
         bunnyItem.setPosition(0, 0, -5);
 
-        gameItems = new GameItem[]{ gameItem1, gameItem2, gameItem3, gameItem4, bunnyItem };
+        gameItems = new GameItem[] { gameItem, bunnyItem };
+
+
+        ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
+
+        Vector3f lightColor = new Vector3f(1, 1, 1);
+        Vector3f lightPosition = new Vector3f(0, 0, 1);
+        float lightIntensity = 1.0f;
+        pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
+        PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
+        pointLight.setAttenuation(att);
     }
 
     @Override
@@ -75,6 +84,13 @@ public class DummyGame implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
             cameraInc.y = -1;
         }
+
+        float lightPos = pointLight.getPosition().z;
+        if (window.isKeyPressed(GLFW_KEY_N)) {
+            this.pointLight.getPosition().z = lightPos + 0.1f;
+        } else if (window.isKeyPressed(GLFW_KEY_M)) {
+            this.pointLight.getPosition().z = lightPos - 0.1f;
+        }
     }
 
     @Override
@@ -93,7 +109,7 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameItems);
+        renderer.render(window, camera, gameItems, ambientLight, pointLight);
     }
 
     @Override

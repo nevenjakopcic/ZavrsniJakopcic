@@ -76,7 +76,7 @@ public class OBJLoader {
                                   indices,  textCoordArr,  normArr);
             }
         }
-        int[] indicesArr = new int[indices.size()];
+        int[] indicesArr;
         indicesArr = indices.stream().mapToInt(v -> v).toArray();
 
         return new Mesh(posArr, textCoordArr, normArr, indicesArr);
@@ -97,7 +97,7 @@ public class OBJLoader {
         // reorder vector normals
         if (indices.idxVecNormal >= 0) {
             Vector3f vecNorm = normList.get(indices.idxVecNormal);
-            normArr[posIndex * 3] = vecNorm.x;
+            normArr[posIndex * 3]     = vecNorm.x;
             normArr[posIndex * 3 + 1] = vecNorm.y;
             normArr[posIndex * 3 + 2] = vecNorm.z;
         }

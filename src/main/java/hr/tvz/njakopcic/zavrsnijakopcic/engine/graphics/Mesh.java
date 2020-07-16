@@ -21,8 +21,7 @@ public class Mesh {
     private final List<Integer> vboIdList;
     @Getter         private final int vaoId;
     @Getter         private final int vertexCount;
-    @Getter @Setter private Texture texture;
-    @Getter @Setter private Vector3f color;
+    @Getter @Setter private Material material;
 
     public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
         FloatBuffer posBuffer = null;
@@ -30,7 +29,6 @@ public class Mesh {
         FloatBuffer vecNormalsBuffer = null;
         IntBuffer indicesBuffer = null;
         try {
-            color = DEFAULT_COLOR;
             vertexCount = indices.length;
             vboIdList = new ArrayList<>();
 
@@ -92,7 +90,7 @@ public class Mesh {
     public void render() {
         if (isTextured()) {
             glActiveTexture(GL_TEXTURE0); // activate first texture unit
-            glBindTexture(GL_TEXTURE_2D, texture.getId());
+            glBindTexture(GL_TEXTURE_2D, material.getTexture().getId());
         }
 
         // draw the mesh
@@ -104,7 +102,7 @@ public class Mesh {
     }
 
     public boolean isTextured() {
-        return this.texture != null;
+        return this.material.getTexture() != null;
     }
 
     public void cleanup() {
@@ -117,7 +115,7 @@ public class Mesh {
         }
 
         if (isTextured()) {
-            texture.cleanup(); // delete the texture
+            material.getTexture().cleanup(); // delete the texture
         }
 
         // delete the VAO

@@ -24,6 +24,9 @@ public class DummyGame implements IGameLogic {
     private PointLight pointLight;
     private DirectionalLight directionalLight;
     private float lightAngle;
+    private SpotLight spotLight;
+    private float spotAngle = 0;
+    private float spotInc = 1;
 
     public DummyGame() {
         renderer = new Renderer();
@@ -58,9 +61,9 @@ public class DummyGame implements IGameLogic {
 
         gameItems = new GameItem[] { gameItem, bunnyItem };
 
-
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
 
+        // point Light
         Vector3f lightColor = new Vector3f(1, 1, 1);
         Vector3f lightPosition = new Vector3f(0, 0, 1);
         float lightIntensity = 1.0f;
@@ -68,8 +71,17 @@ public class DummyGame implements IGameLogic {
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
 
+        // spot light
+        lightPosition = new Vector3f(0, 0.0f, 10f);
+        PointLight sl_pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
+        att = new PointLight.Attenuation(0.0f, 0.0f, 0.02f);
+        sl_pointLight.setAttenuation(att);
+        Vector3f coneDir = new Vector3f(0, 0, -1);
+        float cutoff = (float) Math.cos(Math.toRadians(140));
+        spotLight = new SpotLight(sl_pointLight, coneDir, cutoff);
+
+        // directional light
         lightPosition = new Vector3f(-1, 0, 0);
-        lightColor = new Vector3f(1, 1, 1);
         directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
     }
 
@@ -138,7 +150,7 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        renderer.render(window, camera, gameItems, ambientLight, pointLight, directionalLight);
+        renderer.render(window, camera, gameItems, ambientLight, pointLight, spotLight, directionalLight);
     }
 
     @Override

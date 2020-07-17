@@ -38,6 +38,7 @@ public class Renderer {
         shaderProgram.createUniform("specularPower");
         shaderProgram.createUniform("ambientLight");
         shaderProgram.createPointLightUniform("pointLight");
+        shaderProgram.createDirectionalLightUniform("directionalLight");
 
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
@@ -46,7 +47,12 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameItem[] gameItems, Vector3f ambientLight, PointLight pointLight) {
+    public void render(Window window,
+                       Camera camera,
+                       GameItem[] gameItems,
+                       Vector3f ambientLight,
+                       PointLight pointLight,
+                       DirectionalLight directionalLight) {
         clear();
 
         if (window.isResized()) {
@@ -73,6 +79,13 @@ public class Renderer {
         lightPos.y = aux.y;
         lightPos.z = aux.z;
         shaderProgram.setUniform("pointLight", currPointLight);
+
+        // get a copy of the directional light object and transform its position to view coordinates
+        DirectionalLight currDirLight = new DirectionalLight(directionalLight);
+        Vector4f dir = new Vector4f(currDirLight.getDirection(), 0);
+        dir.mul(viewMatrix);
+        currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
+        shaderProgram.setUniform("directionalLight", currDirLight);
 
         shaderProgram.setUniform("textureSampler", 0);
         // render GameItems

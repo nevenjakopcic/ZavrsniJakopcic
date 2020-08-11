@@ -13,22 +13,10 @@ import static org.lwjgl.stb.STBImage.*;
 public class Texture {
 
     @Getter private final int id;
+    @Getter private final int width;
+    @Getter private final int height;
 
-    public Texture(String filename) throws Exception {
-        this(loadTexture(filename));
-    }
-
-    public Texture(int id) {
-        this.id = id;
-    }
-
-    public void bind() {
-        glBindTexture(GL_TEXTURE_2D, id);
-    }
-
-    private static int loadTexture(String fileName) throws Exception {
-        int width;
-        int height;
+    public Texture(String fileName) throws Exception {
         ByteBuffer buf;
         // load texture file
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -57,7 +45,11 @@ public class Texture {
 
         stbi_image_free(buf);
 
-        return textureId;
+        this.id = textureId;
+    }
+
+    public void bind() {
+        glBindTexture(GL_TEXTURE_2D, id);
     }
 
     public void cleanup() {

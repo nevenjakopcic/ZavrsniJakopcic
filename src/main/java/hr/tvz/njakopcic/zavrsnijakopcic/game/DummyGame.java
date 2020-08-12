@@ -170,6 +170,7 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
+        hud.updateSize(window);
         renderer.render(window, camera, gameItems, sceneLight, hud);
     }
 

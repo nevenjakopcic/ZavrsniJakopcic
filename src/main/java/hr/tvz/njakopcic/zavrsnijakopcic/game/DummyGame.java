@@ -16,8 +16,7 @@ public class DummyGame implements IGameLogic {
     private final Vector3f cameraInc;
     private final Renderer renderer;
     private final Camera camera;
-    private GameItem[] gameItems;
-    private SceneLight sceneLight;
+    private Scene scene;
     private Hud hud;
     private float lightAngle;
     private float spotAngle = 0;
@@ -33,6 +32,8 @@ public class DummyGame implements IGameLogic {
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
+
+        scene = new Scene();
 
         float reflectance = 1f;
 
@@ -58,9 +59,17 @@ public class DummyGame implements IGameLogic {
         GameItem bunnyItem = new GameItem(bunnyMesh);
         bunnyItem.setPosition(0, 0, -5);
 
-        gameItems = new GameItem[] { gameItem, bunnyItem };
+        scene.setGameItems(new GameItem[] { gameItem, bunnyItem });
 
-        sceneLight = new SceneLight();
+        setupLights();
+
+        hud = new Hud("DEMO");
+    }
+
+    private void setupLights() {
+        SceneLight sceneLight = new SceneLight();
+
+        scene.setSceneLight(sceneLight);
 
         sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
 
@@ -86,9 +95,6 @@ public class DummyGame implements IGameLogic {
         // directional light
         lightPosition = new Vector3f(-1, 0, 0);
         sceneLight.setDirectionalLight(new DirectionalLight(lightColor, lightPosition, lightIntensity));
-
-        // hud
-        hud = new Hud("DEMO");
     }
 
     @Override
@@ -110,7 +116,7 @@ public class DummyGame implements IGameLogic {
             cameraInc.y = -1;
         }
 
-        SpotLight[] spotLightList = sceneLight.getSpotLightList();
+        SpotLight[] spotLightList = scene.getSceneLight().getSpotLightList();
         float lightPos = spotLightList[0].getPointLight().getPosition().z;
         if (window.isKeyPressed(GLFW_KEY_N)) {
             spotLightList[0].getPointLight().getPosition().z = lightPos + 0.1f;
@@ -140,12 +146,12 @@ public class DummyGame implements IGameLogic {
             spotInc = 1;
         }
         double spotAngleRad = Math.toRadians(spotAngle);
-        SpotLight[] spotLightList = sceneLight.getSpotLightList();
+        SpotLight[] spotLightList = scene.getSceneLight().getSpotLightList();
         Vector3f coneDir = spotLightList[0].getConeDirection();
         coneDir.y = (float) Math.sin(spotAngleRad);
 
         // update directional light direction, intensity and color
-        DirectionalLight directionalLight = sceneLight.getDirectionalLight();
+        DirectionalLight directionalLight = scene.getSceneLight().getDirectionalLight();
         lightAngle += 1.1f;
         if (lightAngle > 90) {
             directionalLight.setIntensity(0);
@@ -171,13 +177,13 @@ public class DummyGame implements IGameLogic {
     @Override
     public void render(Window window) {
         hud.updateSize(window);
-        renderer.render(window, camera, gameItems, sceneLight, hud);
+        renderer.render(window, camera, scene, hud);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for (GameItem gameItem : gameItems) {
+        for (GameItem gameItem : scene.getGameItems()) {
             gameItem.getMesh().cleanup();
         }
         hud.cleanup();

@@ -67,8 +67,7 @@ public class Renderer {
 
     public void render(Window window,
                        Camera camera,
-                       GameItem[] gameItems,
-                       SceneLight sceneLight,
+                       Scene scene,
                        IHud hud) {
 
         clear();
@@ -78,15 +77,14 @@ public class Renderer {
             window.setResized(false);
         }
 
-        renderScene(window, camera, gameItems, sceneLight);
+        renderScene(window, camera, scene);
 
         renderHud(window, hud);
     }
 
     private void renderScene(Window window,
                              Camera camera,
-                             GameItem[] gameItems,
-                             SceneLight sceneLight) {
+                             Scene scene) {
 
         sceneShaderProgram.bind();
 
@@ -95,10 +93,13 @@ public class Renderer {
 
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
+        SceneLight sceneLight = scene.getSceneLight();
         renderLights(viewMatrix, sceneLight);
 
         sceneShaderProgram.setUniform("textureSampler", 0);
+
         // render GameItems
+        GameItem[] gameItems = scene.getGameItems();
         for (GameItem gameItem : gameItems) {
             Mesh mesh = gameItem.getMesh();
             // set model view matrix

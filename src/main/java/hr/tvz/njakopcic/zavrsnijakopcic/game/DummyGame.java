@@ -6,6 +6,9 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class DummyGame implements IGameLogic {
@@ -59,7 +62,19 @@ public class DummyGame implements IGameLogic {
         GameItem bunnyItem = new GameItem(bunnyMesh);
         bunnyItem.setPosition(0, 0, -5);
 
-        scene.setGameItems(new GameItem[] { gameItem, bunnyItem });
+        // plane mesh
+        Mesh planeMesh = OBJLoader.loadMesh("/models/plane.obj");
+        Texture planeTexture = new Texture("textures/back.png");
+        Material planeMaterial = new Material(planeTexture, reflectance);
+        planeMesh.setMaterial(planeMaterial);
+
+        // plane item
+        GameItem planeItem = new GameItem(planeMesh);
+        planeItem.setPosition(0, 0, -20);
+        planeItem.setRotation(-90, 0, 0);
+        planeItem.setScale(20);
+
+        scene.setGameItems(new GameItem[] { gameItem, bunnyItem, planeItem });
 
         setupLights();
 
@@ -71,7 +86,7 @@ public class DummyGame implements IGameLogic {
 
         scene.setSceneLight(sceneLight);
 
-        sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
+        sceneLight.setAmbientLight(new Vector3f(0.7f, 0.7f, 0.7f));
 
         // point Light
         Vector3f lightColor = new Vector3f(1, 1, 1);
@@ -183,8 +198,9 @@ public class DummyGame implements IGameLogic {
     @Override
     public void cleanup() {
         renderer.cleanup();
-        for (GameItem gameItem : scene.getGameItems()) {
-            gameItem.getMesh().cleanup();
+        Map<Mesh, List<GameItem>> meshMap = scene.getMeshMap();
+        for (Mesh mesh : meshMap.keySet()) {
+            mesh.cleanup();
         }
         hud.cleanup();
     }

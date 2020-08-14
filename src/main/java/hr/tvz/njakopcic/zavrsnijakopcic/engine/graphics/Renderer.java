@@ -5,6 +5,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer {
@@ -65,10 +68,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window,
-                       Camera camera,
-                       Scene scene,
-                       IHud hud) {
+    public void render(Window window, Camera camera, Scene scene, IHud hud) {
 
         clear();
 
@@ -77,37 +77,34 @@ public class Renderer {
             window.setResized(false);
         }
 
-        renderScene(window, camera, scene);
+        transformation.updateProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        transformation.updateViewMatrix(camera);
 
+        renderScene(window, camera, scene);
         renderHud(window, hud);
     }
 
-    private void renderScene(Window window,
-                             Camera camera,
-                             Scene scene) {
+    private void renderScene(Window window, Camera camera, Scene scene) {
 
         sceneShaderProgram.bind();
 
-        Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix();
         sceneShaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
-        Matrix4f viewMatrix = transformation.getViewMatrix(camera);
-
+        Matrix4f viewMatrix = transformation.getViewMatrix();
         SceneLight sceneLight = scene.getSceneLight();
         renderLights(viewMatrix, sceneLight);
 
         sceneShaderProgram.setUniform("textureSampler", 0);
 
-        // render GameItems
-        GameItem[] gameItems = scene.getGameItems();
-        for (GameItem gameItem : gameItems) {
-            Mesh mesh = gameItem.getMesh();
-            // set model view matrix
-            Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
-            sceneShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-            // render mesh
+        // render each mesh with the associated game items
+        Map<Mesh, List<GameItem>> meshMap = scene.getMeshMap();
+        for (Mesh mesh : meshMap.keySet()) {
             sceneShaderProgram.setUniform("material", mesh.getMaterial());
-            mesh.render();
+            mesh.renderList(meshMap.get(mesh), gameItem -> {
+                Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(gameItem, viewMatrix);
+                sceneShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            });
         }
 
         sceneShaderProgram.unbind();
@@ -168,7 +165,7 @@ public class Renderer {
         for (GameItem gameItem : hud.getGameItems()) {
             Mesh mesh = gameItem.getMesh();
             // set orthographic and model matrix for this HUD item
-            Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(gameItem, ortho);
+            Matrix4f projModelMatrix = transformation.buildOrtoProjModelMatrix(gameItem, ortho);
             hudShaderProgram.setUniform("projModelMatrix", projModelMatrix);
             hudShaderProgram.setUniform("color", gameItem.getMesh().getMaterial().getAmbientColor());
 

@@ -1,5 +1,6 @@
 package hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics;
 
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.GameItem;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Vector3f;
@@ -9,6 +10,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -42,7 +44,6 @@ public class Mesh {
             posBuffer.put(positions).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
             // texture coords VBO
@@ -52,7 +53,6 @@ public class Mesh {
             textCoordsBuffer.put(textCoords).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(1);
             glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 
             // vertex normals VBO
@@ -62,7 +62,6 @@ public class Mesh {
             vecNormalsBuffer.put(normals).flip();
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
 
             // index VBO
@@ -87,18 +86,43 @@ public class Mesh {
         }
     }
 
-    public void render() {
+    private void initRender() {
         if (isTextured()) {
             glActiveTexture(GL_TEXTURE0); // activate first texture unit
             glBindTexture(GL_TEXTURE_2D, material.getTexture().getId());
         }
 
-        // draw the mesh
         glBindVertexArray(getVaoId());
-        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
+    }
 
-        glBindVertexArray(0); // restore state
+    private void endRender() {
+        // restore state
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+        glBindVertexArray(0);
+
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    public void render() {
+        initRender();
+        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        endRender();
+    }
+
+    public void renderList(List<GameItem> gameItems, Consumer<GameItem> consumer) {
+        initRender();
+
+        for(GameItem gameItem : gameItems) {
+            consumer.accept(gameItem); // setup data required by gameItem
+            glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+        }
+
+        endRender();
     }
 
     public boolean isTextured() {

@@ -1,6 +1,7 @@
 package hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics;
 
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.*;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.IParticleEmitter;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -20,6 +21,7 @@ public class Renderer {
     private final Transformation transformation;
     private ShaderProgram sceneShaderProgram;
     private ShaderProgram hudShaderProgram;
+    private ShaderProgram particlesShaderProgram;
     private final float specularPower;
 
     public Renderer() {
@@ -29,6 +31,7 @@ public class Renderer {
 
     public void init(Window window) throws Exception {
         setupSceneShader();
+        setupParticlesShader();
         setupHudShader();
 
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -51,6 +54,17 @@ public class Renderer {
         sceneShaderProgram.createPointLightListUniform("pointLights", MAX_POINT_LIGHTS);
         sceneShaderProgram.createSpotLightListUniform("spotLights", MAX_SPOT_LIGHTS);
         sceneShaderProgram.createDirectionalLightUniform("directionalLight");
+    }
+
+    private void setupParticlesShader() throws Exception {
+        particlesShaderProgram = new ShaderProgram();
+        particlesShaderProgram.createVertexShader(Utils.loadResource("/shaders/particle_vertex.glsl"));
+        particlesShaderProgram.createFragmentShader(Utils.loadResource("/shaders/particle_fragment.glsl"));
+        particlesShaderProgram.link();
+
+        particlesShaderProgram.createUniform("projectionMatrix");
+        particlesShaderProgram.createUniform("modelViewMatrix");
+        particlesShaderProgram.createUniform("textureSampler");
     }
 
     private void setupHudShader() throws Exception {
@@ -81,6 +95,7 @@ public class Renderer {
         transformation.updateViewMatrix(camera);
 
         renderScene(window, camera, scene);
+        renderParticles(window, camera, scene);
         renderHud(window, hud);
     }
 
@@ -156,6 +171,41 @@ public class Renderer {
         dir.mul(viewMatrix);
         currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
         sceneShaderProgram.setUniform("directionalLight", currDirLight);
+    }
+
+    private void renderParticles(Window window, Camera camera, Scene scene) {
+        particlesShaderProgram.bind();
+
+        particlesShaderProgram.setUniform("textureSampler", 0);
+        Matrix4f projectionMatrix = transformation.getProjectionMatrix();
+        particlesShaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
+        Matrix4f viewMatrix = transformation.getViewMatrix();
+        IParticleEmitter[] emitters = scene.getParticleEmitters();
+        int numEmitters = emitters != null ? emitters.length : 0;
+
+        glDepthMask(false);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+        for (int i = 0; i < numEmitters; i++) {
+            IParticleEmitter emitter = emitters[i];
+            Mesh mesh = emitter.getBaseParticle().getMesh();
+
+            mesh.renderList(emitter.getParticles(), (GameItem gameItem) -> {
+                Matrix4f modelMatrix = transformation.buildModelMatrix(gameItem);
+
+                viewMatrix.transpose3x3(modelMatrix);
+
+                Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+                modelViewMatrix.scale(gameItem.getScale());
+                particlesShaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            });
+        }
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(true);
+
+        particlesShaderProgram.unbind();
     }
 
     private void renderHud(Window window, IHud hud) {

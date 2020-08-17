@@ -2,6 +2,8 @@ package hr.tvz.njakopcic.zavrsnijakopcic.game;
 
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.*;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.*;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.FlowParticleEmitter;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.Particle;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -21,6 +23,7 @@ public class DummyGame implements IGameLogic {
     private final Camera camera;
     private Scene scene;
     private Hud hud;
+    private FlowParticleEmitter particleEmitter;
     private float lightAngle;
     private float spotAngle = 0;
     private float spotInc = 1;
@@ -75,6 +78,25 @@ public class DummyGame implements IGameLogic {
         planeItem.setScale(20);
 
         scene.setGameItems(new GameItem[] { gameItem, bunnyItem, planeItem });
+
+        Vector3f particleSpeed = new Vector3f(0, 1, 0);
+        particleSpeed.mul(2.5f);
+        long lifespan = 4000;
+        int maxParticles = 200;
+        long creationPeriodMillis = 300;
+        float range = 0.2f;
+        float scale = 1.0f;
+        Mesh partMesh = OBJLoader.loadMesh("/models/particle.obj");
+        Texture texture = new Texture("textures/particle.png");
+        Material partMaterial = new Material(texture, reflectance);
+        partMesh.setMaterial(partMaterial);
+        Particle particle = new Particle(partMesh, particleSpeed, lifespan);
+        particle.setScale(scale);
+        particleEmitter = new FlowParticleEmitter(particle, maxParticles, creationPeriodMillis);
+        particleEmitter.setActive(true);
+        particleEmitter.setPositionRndRange(range);
+        particleEmitter.setSpeedRndRange(range);
+        scene.setParticleEmitters(new FlowParticleEmitter[] { particleEmitter });
 
         setupLights();
 
@@ -187,6 +209,8 @@ public class DummyGame implements IGameLogic {
         double angRad = Math.toRadians(lightAngle);
         directionalLight.getDirection().x = (float) Math.sin(angRad);
         directionalLight.getDirection().y = (float) Math.cos(angRad);
+
+        particleEmitter.update((long)(interval * 1000));
     }
 
     @Override

@@ -57,6 +57,22 @@ public class Transformation {
         return orthoMatrix;
     }
 
+    public Matrix4f buildModelMatrix(GameItem gameItem) {
+        Vector3f rotation = gameItem.getRotation();
+        modelMatrix.identity().translate(gameItem.getPosition())
+                .rotateX((float)Math.toRadians(-rotation.x))
+                .rotateY((float)Math.toRadians(-rotation.y))
+                .rotateZ((float)Math.toRadians(-rotation.z))
+                .scale(gameItem.getScale());
+
+        return modelMatrix;
+    }
+
+    public Matrix4f buildModelViewMatrix(Matrix4f modelMatrix, Matrix4f viewMatrix) {
+        modelViewMatrix.set(viewMatrix);
+        return modelViewMatrix.mul(modelMatrix);
+    }
+
     public Matrix4f buildModelViewMatrix(GameItem gameItem, Matrix4f viewMatrix) {
         Vector3f rotation = gameItem.getRotation();
         modelMatrix.identity().translate(gameItem.getPosition())

@@ -1,6 +1,7 @@
 package hr.tvz.njakopcic.zavrsnijakopcic.engine;
 
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Mesh;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.IParticleEmitter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +12,9 @@ import java.util.Map;
 
 public class Scene {
 
-    @Getter         private Map<Mesh, List<GameItem>> meshMap;
+    @Getter         private final Map<Mesh, List<GameItem>> meshMap;
     @Getter @Setter private SceneLight sceneLight;
+    @Getter @Setter private IParticleEmitter[] particleEmitters;
 
     public Scene() {
         meshMap = new HashMap<>();

@@ -15,6 +15,14 @@ public class Texture {
     @Getter private final int id;
     @Getter private final int width;
     @Getter private final int height;
+    @Getter private int numCols = 1;
+    @Getter private int numRows = 1;
+
+    public Texture(String fileName, int numCols, int numRows) throws Exception {
+        this(fileName);
+        this.numCols = numCols;
+        this.numRows = numRows;
+    }
 
     public Texture(String fileName) throws Exception {
         ByteBuffer buf;

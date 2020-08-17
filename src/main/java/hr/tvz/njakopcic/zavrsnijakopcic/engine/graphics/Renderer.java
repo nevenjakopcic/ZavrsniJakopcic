@@ -65,6 +65,11 @@ public class Renderer {
         particlesShaderProgram.createUniform("projectionMatrix");
         particlesShaderProgram.createUniform("modelViewMatrix");
         particlesShaderProgram.createUniform("textureSampler");
+
+        particlesShaderProgram.createUniform("texXOffset");
+        particlesShaderProgram.createUniform("texYOffset");
+        particlesShaderProgram.createUniform("numCols");
+        particlesShaderProgram.createUniform("numRows");
     }
 
     private void setupHudShader() throws Exception {
@@ -191,10 +196,22 @@ public class Renderer {
             IParticleEmitter emitter = emitters[i];
             Mesh mesh = emitter.getBaseParticle().getMesh();
 
+            Texture texture = mesh.getMaterial().getTexture();
+            particlesShaderProgram.setUniform("numCols", texture.getNumCols());
+            particlesShaderProgram.setUniform("numRows", texture.getNumRows());
+
             mesh.renderList(emitter.getParticles(), (GameItem gameItem) -> {
+                int col = gameItem.getTexturePos() % texture.getNumCols();
+                int row = gameItem.getTexturePos() / texture.getNumCols();
+                float texXOffset = (float) col / texture.getNumCols();
+                float texYOffset = (float) row / texture.getNumRows();
+                particlesShaderProgram.setUniform("texXOffset", texXOffset);
+                particlesShaderProgram.setUniform("texYOffset", texYOffset);
+
                 Matrix4f modelMatrix = transformation.buildModelMatrix(gameItem);
 
                 viewMatrix.transpose3x3(modelMatrix);
+                viewMatrix.scale(gameItem.getScale());
 
                 Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
                 modelViewMatrix.scale(gameItem.getScale());

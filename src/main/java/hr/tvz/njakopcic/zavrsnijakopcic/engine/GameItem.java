@@ -11,11 +11,13 @@ public class GameItem {
     @Getter         private final Vector3f position;
     @Getter @Setter private float scale;
     @Getter         private final Vector3f rotation;
+    @Getter @Setter private int texturePos;
 
     public GameItem() {
         position = new Vector3f();
         scale = 1;
         rotation = new Vector3f();
+        texturePos = 0;
     }
 
     public GameItem(Mesh mesh) {

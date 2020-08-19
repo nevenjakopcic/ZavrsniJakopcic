@@ -23,6 +23,12 @@ public class Transformation {
         orthoModelMatrix = new Matrix4f();
     }
 
+    public static Matrix4f updateGenericViewMatrix(Vector3f position, Vector3f rotation, Matrix4f matrix) {
+        return matrix.rotationX((float)Math.toRadians(rotation.x))
+                     .rotateY((float)Math.toRadians(rotation.y))
+                     .translate(-position.x, -position.y, -position.z);
+    }
+
     public final Matrix4f updateProjectionMatrix(float fov, float width, float height, float zNear, float zFar) {
         return projectionMatrix.setPerspective(fov, width / height, zNear, zFar);
     }
@@ -37,18 +43,6 @@ public class Transformation {
                 .translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
         return viewMatrix;
-    }
-
-    public Matrix4f getModelViewMatrix(GameItem gameItem, Matrix4f viewMatrix) {
-        Vector3f rotation = gameItem.getRotation();
-        modelViewMatrix.identity().translate(gameItem.getPosition())
-                .rotateX((float)Math.toRadians(-rotation.x))
-                .rotateY((float)Math.toRadians(-rotation.y))
-                .rotateZ((float)Math.toRadians(-rotation.z))
-                .scale(gameItem.getScale());
-        Matrix4f viewCurr = new Matrix4f(viewMatrix);
-
-        return viewCurr.mul(modelViewMatrix);
     }
 
     public Matrix4f getOrthoProjectionMatrix(float left, float right, float bottom, float top) {

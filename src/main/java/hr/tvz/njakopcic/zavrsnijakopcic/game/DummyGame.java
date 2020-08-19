@@ -4,6 +4,7 @@ import hr.tvz.njakopcic.zavrsnijakopcic.engine.*;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.*;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.FlowParticleEmitter;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.Particle;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.sound.SoundManager;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -20,6 +21,7 @@ public class DummyGame implements IGameLogic {
 
     private final Vector3f cameraInc;
     private final Renderer renderer;
+    private final SoundManager soundMgr;
     private final Camera camera;
     private Scene scene;
     private Hud hud;
@@ -28,8 +30,11 @@ public class DummyGame implements IGameLogic {
     private float spotAngle = 0;
     private float spotInc = 1;
 
+    private enum Sounds { MUSIC }
+
     public DummyGame() {
         renderer = new Renderer();
+        soundMgr = new SoundManager();
         camera = new Camera();
         cameraInc = new Vector3f();
         lightAngle = -90;
@@ -101,6 +106,16 @@ public class DummyGame implements IGameLogic {
         setupLights();
 
         hud = new Hud("DEMO");
+
+        // sound
+        setupSounds();
+    }
+
+    private void setupSounds() throws Exception {
+        soundMgr.init();
+
+        soundMgr.addSound(Sounds.MUSIC.ordinal(), "/sounds/music.ogg", true, true);
+        soundMgr.playSoundSource(Sounds.MUSIC.ordinal()); // play background music
     }
 
     private void setupLights() {
@@ -211,6 +226,8 @@ public class DummyGame implements IGameLogic {
         directionalLight.getDirection().y = (float) Math.cos(angRad);
 
         particleEmitter.update((long)(interval * 1000));
+
+        soundMgr.updateListenerPosition(camera);
     }
 
     @Override
@@ -222,6 +239,7 @@ public class DummyGame implements IGameLogic {
     @Override
     public void cleanup() {
         renderer.cleanup();
+        soundMgr.cleanup();
         Map<Mesh, List<GameItem>> meshMap = scene.getMeshMap();
         for (Mesh mesh : meshMap.keySet()) {
             mesh.cleanup();

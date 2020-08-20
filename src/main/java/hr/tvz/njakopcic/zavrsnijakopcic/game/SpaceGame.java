@@ -164,7 +164,7 @@ public class SpaceGame implements IGameLogic {
 
         // player movement
         float playerX = playerPosition.x;
-        if (!gameOver && playerX < 35.0f && playerInc > 0 || playerX > -35.0f && playerInc < 0) {
+        if (!gameOver && playerX < 35.0f && playerInc > 0 || !gameOver && playerX > -35.0f && playerInc < 0) {
             playerItem.movePosition(playerInc * PLAYER_POS_STEP, 0, 0);
         }
 

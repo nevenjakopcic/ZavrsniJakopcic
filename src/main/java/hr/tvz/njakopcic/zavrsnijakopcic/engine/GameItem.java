@@ -1,9 +1,13 @@
 package hr.tvz.njakopcic.zavrsnijakopcic.engine;
 
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Material;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Mesh;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.OBJLoader;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.Texture;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class GameItem {
 
@@ -35,5 +39,27 @@ public class GameItem {
         this.rotation.x = x;
         this.rotation.y = y;
         this.rotation.z = z;
+    }
+
+    public static GameItem createItem(String model, String texture, float reflectance) throws Exception {
+        Mesh mesh = OBJLoader.loadMesh(model);
+        Material material = new Material(new Texture(texture), reflectance);
+        mesh.setMaterial(material);
+
+        return new GameItem(mesh);
+    }
+
+    public static GameItem createItem(String model, Vector4f color, float reflectance) throws Exception {
+        Mesh mesh = OBJLoader.loadMesh(model);
+        Material material = new Material(color, reflectance);
+        mesh.setMaterial(material);
+
+        return new GameItem(mesh);
+    }
+
+    public void movePosition(float dx, float dy, float dz) {
+        this.position.x += dx;
+        this.position.y += dy;
+        this.position.z += dz;
     }
 }

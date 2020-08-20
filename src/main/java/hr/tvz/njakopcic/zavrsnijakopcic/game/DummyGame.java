@@ -9,6 +9,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,13 +18,14 @@ import static org.lwjgl.glfw.GLFW.*;
 public class DummyGame implements IGameLogic {
 
     private static final float MOUSE_SENSITIVITY = 0.2f;
-    private static final float CAMERA_POS_STEP = 0.05f;
+    private static final float CAMERA_POS_STEP = 0.2f;
 
     private final Vector3f cameraInc;
     private final Renderer renderer;
     private final SoundManager soundMgr;
     private final Camera camera;
     private Scene scene;
+    private List<GameItem> gameItems;
     private Hud hud;
     private FlowParticleEmitter particleEmitter;
     private float lightAngle;
@@ -46,19 +48,22 @@ public class DummyGame implements IGameLogic {
 
         scene = new Scene();
 
+        gameItems = new ArrayList<>();
+
+        camera.setPosition(0, 0, 40.0f);
+
         float reflectance = 1f;
 
         // spaceship mesh
         Mesh spaceshipMesh = OBJLoader.loadMesh("/models/spaceship.obj");
-        Texture spaceshipTexture = new Texture("textures/spaceship.png");
+        Texture spaceshipTexture = new Texture("textures/enemy.png");
         Material spaceshipMaterial = new Material(spaceshipTexture, reflectance);
         spaceshipMesh.setMaterial(spaceshipMaterial);
 
         // spaceship item
         GameItem gameItem = new GameItem(spaceshipMesh);
-        gameItem.setScale(0.25f);
         gameItem.setPosition(0, 0, -2);
-
+        gameItems.add(gameItem);
 
         // bunny mesh
         Mesh bunnyMesh = OBJLoader.loadMesh("/models/bunny.obj");
@@ -69,6 +74,7 @@ public class DummyGame implements IGameLogic {
         // bunny item
         GameItem bunnyItem = new GameItem(bunnyMesh);
         bunnyItem.setPosition(0, 0, -5);
+        gameItems.add(bunnyItem);
 
         // plane mesh
         Mesh planeMesh = OBJLoader.loadMesh("/models/plane.obj");
@@ -78,11 +84,12 @@ public class DummyGame implements IGameLogic {
 
         // plane item
         GameItem planeItem = new GameItem(planeMesh);
-        planeItem.setPosition(0, 0, -20);
+        planeItem.setPosition(0, 0, -80);
         planeItem.setRotation(-90, 0, 0);
-        planeItem.setScale(20);
+        planeItem.setScale(80);
+        gameItems.add(planeItem);
 
-        scene.setGameItems(new GameItem[] { gameItem, bunnyItem, planeItem });
+        scene.setGameItems(gameItems);
 
         Vector3f particleSpeed = new Vector3f(0, 1, 0);
         particleSpeed.mul(2.5f);
@@ -114,8 +121,8 @@ public class DummyGame implements IGameLogic {
     private void setupSounds() throws Exception {
         soundMgr.init();
 
-        soundMgr.addSound(Sounds.MUSIC.ordinal(), "/sounds/music.ogg", true, true);
-        soundMgr.playSoundSource(Sounds.MUSIC.ordinal()); // play background music
+//        soundMgr.addSound(Sounds.MUSIC.ordinal(), "/sounds/music.ogg", true, true);
+//        soundMgr.playSoundSource(Sounds.MUSIC.ordinal()); // play background music
     }
 
     private void setupLights() {

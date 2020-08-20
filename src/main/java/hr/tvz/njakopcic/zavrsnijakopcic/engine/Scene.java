@@ -20,10 +20,11 @@ public class Scene {
         meshMap = new HashMap<>();
     }
 
-    public void setGameItems(GameItem[] gameItems) {
-        int numGameItems = gameItems != null ? gameItems.length : 0;
+    public void setGameItems(List<GameItem> gameItems) {
+        meshMap.clear();
+        int numGameItems = gameItems != null ? gameItems.size() : 0;
         for (int i = 0; i < numGameItems; i++) {
-            GameItem gameItem = gameItems[i];
+            GameItem gameItem = gameItems.get(i);
             Mesh mesh = gameItem.getMesh();
 
             List<GameItem> list = meshMap.computeIfAbsent(mesh, k -> new ArrayList<>());

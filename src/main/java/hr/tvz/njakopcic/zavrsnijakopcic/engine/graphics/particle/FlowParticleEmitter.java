@@ -25,7 +25,7 @@ public class FlowParticleEmitter implements IParticleEmitter {
         particles = new ArrayList<>();
         this.baseParticle = baseParticle;
         this.maxParticles = maxParticles;
-        this.active = false;
+        this.active = true;
         this.lastCreationTime = 0;
         this.creationPeriodMillis = creationPeriodMillis;
     }

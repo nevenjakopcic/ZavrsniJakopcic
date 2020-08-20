@@ -93,22 +93,22 @@ public class DummyGame implements IGameLogic {
 
         Vector3f particleSpeed = new Vector3f(0, 1, 0);
         particleSpeed.mul(2.5f);
-        long lifespan = 4000;
+        long lifespan = 1500;
         int maxParticles = 200;
-        long creationPeriodMillis = 300;
+        long creationPeriodMillis = 800;
         float range = 0.2f;
         float scale = 1.0f;
         Mesh partMesh = OBJLoader.loadMesh("/models/particle.obj");
-        Texture texture = new Texture("textures/particle_anim.png", 4, 4);
+        Texture texture = new Texture("textures/explosion_anim.png", 8, 6);
         Material partMaterial = new Material(texture, reflectance);
         partMesh.setMaterial(partMaterial);
-        Particle particle = new Particle(partMesh, particleSpeed, lifespan, 100);
+        Particle particle = new Particle(partMesh, particleSpeed, lifespan, 20);
         particle.setScale(scale);
         particleEmitter = new FlowParticleEmitter(particle, maxParticles, creationPeriodMillis);
         particleEmitter.setActive(true);
         particleEmitter.setPositionRndRange(range);
         particleEmitter.setSpeedRndRange(range);
-        scene.setParticleEmitters(new FlowParticleEmitter[] { particleEmitter });
+        scene.getParticleEmitters().add(particleEmitter);
 
         setupLights();
 
@@ -121,8 +121,8 @@ public class DummyGame implements IGameLogic {
     private void setupSounds() throws Exception {
         soundMgr.init();
 
-//        soundMgr.addSound(Sounds.MUSIC.ordinal(), "/sounds/music.ogg", true, true);
-//        soundMgr.playSoundSource(Sounds.MUSIC.ordinal()); // play background music
+        soundMgr.addSound(Sounds.MUSIC.ordinal(), "/sounds/music.ogg", true, true);
+        soundMgr.playSoundSource(Sounds.MUSIC.ordinal()); // play background music
     }
 
     private void setupLights() {
@@ -139,7 +139,8 @@ public class DummyGame implements IGameLogic {
         PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
         pointLight.setAttenuation(att);
-        sceneLight.setPointLightList(new PointLight[] { pointLight });
+        sceneLight.setPointLightList(new ArrayList<>());
+        sceneLight.getPointLightList().add(pointLight);
 
         // spot light
         lightPosition = new Vector3f(0, 0.0f, 10f);

@@ -16,7 +16,7 @@ public class Renderer {
     private static final float FOV = (float) Math.toRadians(60.0f);
     private static final float Z_NEAR = 0.01f;
     private static final float Z_FAR = 1000.f;
-    private static final int MAX_POINT_LIGHTS = 5;
+    private static final int MAX_POINT_LIGHTS = 10;
     private static final int MAX_SPOT_LIGHTS = 5;
     private final Transformation transformation;
     private ShaderProgram sceneShaderProgram;
@@ -137,11 +137,11 @@ public class Renderer {
         sceneShaderProgram.setUniform("specularPower", specularPower);
 
         // process point lights
-        PointLight[] pointLightList = sceneLight.getPointLightList();
-        int numLights = pointLightList != null ? pointLightList.length : 0;
+        List<PointLight> pointLightList = sceneLight.getPointLightList();
+        int numLights = pointLightList != null ? pointLightList.size() : 0;
         for (int i = 0; i < numLights; i++) {
             // get a copy of the light object and transform its position to view coordinates
-            PointLight currPointLight = new PointLight(pointLightList[i]);
+            PointLight currPointLight = new PointLight(pointLightList.get(i));
             Vector3f lightPos = currPointLight.getPosition();
             Vector4f aux = new Vector4f(lightPos, 1);
             aux.mul(viewMatrix);
@@ -186,14 +186,14 @@ public class Renderer {
         particlesShaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         Matrix4f viewMatrix = transformation.getViewMatrix();
-        IParticleEmitter[] emitters = scene.getParticleEmitters();
-        int numEmitters = emitters != null ? emitters.length : 0;
+        List<IParticleEmitter> emitters = scene.getParticleEmitters();
+        int numEmitters = emitters != null ? emitters.size() : 0;
 
         glDepthMask(false);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
         for (int i = 0; i < numEmitters; i++) {
-            IParticleEmitter emitter = emitters[i];
+            IParticleEmitter emitter = emitters.get(i);
             Mesh mesh = emitter.getBaseParticle().getMesh();
 
             Texture texture = mesh.getMaterial().getTexture();

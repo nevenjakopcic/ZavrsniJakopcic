@@ -14,10 +14,11 @@ public class Scene {
 
     @Getter         private final Map<Mesh, List<GameItem>> meshMap;
     @Getter @Setter private SceneLight sceneLight;
-    @Getter @Setter private IParticleEmitter[] particleEmitters;
+    @Getter @Setter private List<IParticleEmitter> particleEmitters;
 
     public Scene() {
         meshMap = new HashMap<>();
+        particleEmitters = new ArrayList<>();
     }
 
     public void setGameItems(List<GameItem> gameItems) {

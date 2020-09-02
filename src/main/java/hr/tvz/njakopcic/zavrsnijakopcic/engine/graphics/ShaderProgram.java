@@ -1,5 +1,8 @@
 package hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics;
 
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights.DirectionalLight;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights.PointLight;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights.SpotLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

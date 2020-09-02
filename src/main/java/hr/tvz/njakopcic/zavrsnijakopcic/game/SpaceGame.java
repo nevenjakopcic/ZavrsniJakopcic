@@ -2,6 +2,7 @@ package hr.tvz.njakopcic.zavrsnijakopcic.game;
 
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.*;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.*;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights.DirectionalLight;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.FlowParticleEmitter;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.IParticleEmitter;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.Particle;

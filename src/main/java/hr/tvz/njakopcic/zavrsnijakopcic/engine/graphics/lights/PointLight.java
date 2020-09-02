@@ -1,4 +1,4 @@
-package hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics;
+package hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights;
 
 import lombok.Getter;
 import lombok.Setter;

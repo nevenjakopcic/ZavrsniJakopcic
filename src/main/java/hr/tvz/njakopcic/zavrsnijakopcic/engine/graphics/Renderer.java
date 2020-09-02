@@ -1,6 +1,9 @@
 package hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics;
 
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.*;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights.DirectionalLight;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights.PointLight;
+import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.lights.SpotLight;
 import hr.tvz.njakopcic.zavrsnijakopcic.engine.graphics.particle.IParticleEmitter;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -83,7 +86,7 @@ public class Renderer {
         hudShaderProgram.createUniform("color");
     }
 
-    public void clear() {
+    private void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 

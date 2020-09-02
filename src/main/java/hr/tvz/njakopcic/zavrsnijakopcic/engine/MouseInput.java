@@ -10,8 +10,8 @@ public class MouseInput {
 
     private final Vector2d previousPos;
     private final Vector2d currentPos;
-    @Getter private final Vector2f displVec;
     private boolean inWindow = false;
+    @Getter private final Vector2f displVec;
     @Getter private boolean leftButtonPressed = false;
     @Getter private boolean rightButtonPressed = false;
 

@@ -118,7 +118,7 @@ public class Mesh {
         initRender();
 
         for(GameItem gameItem : gameItems) {
-            consumer.accept(gameItem); // setup data required by gameItem
+            consumer.accept(gameItem); // set up data required by gameItem
             glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
         }
 

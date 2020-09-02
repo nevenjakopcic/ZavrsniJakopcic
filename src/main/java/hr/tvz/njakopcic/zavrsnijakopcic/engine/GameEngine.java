@@ -24,23 +24,24 @@ public class GameEngine implements Runnable {
             gameLoop();
         } catch (Exception e) {
             e.printStackTrace(System.err);
+        } finally {
+            cleanup();
         }
     }
 
-    protected void init() throws Exception {
+    private void init() throws Exception {
         window.init();
         timer.init();
         mouseInput.init(window);
         gameLogic.init(window);
     }
 
-    protected void gameLoop() {
+    private void gameLoop() {
         float elapsedTime;
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
 
-        boolean running = true;
-        while (running && !window.windowShouldClose()) {
+        while (!window.windowShouldClose()) {
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
 
@@ -59,7 +60,7 @@ public class GameEngine implements Runnable {
         }
     }
 
-    protected void cleanup() {
+    private void cleanup() {
         gameLogic.cleanup();
     }
 
@@ -76,16 +77,16 @@ public class GameEngine implements Runnable {
         }
     }
 
-    protected void input() {
+    private void input() {
         mouseInput.input(window);
         gameLogic.input(window, mouseInput);
     }
 
-    protected void update(float interval) {
+    private void update(float interval) {
         gameLogic.update(interval, mouseInput);
     }
 
-    protected void render() {
+    private void render() {
         gameLogic.render(window);
         window.update();
     }

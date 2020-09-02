@@ -46,9 +46,9 @@ uniform sampler2D textureSampler;
 uniform vec3 ambientLight;
 uniform float specularPower;
 uniform Material material;
+uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
-uniform DirectionalLight directionalLight;
 
 vec4 ambientC;
 vec4 diffuseC;
@@ -104,7 +104,6 @@ vec4 calcSpotLight(SpotLight light, vec3 position, vec3 normal) {
     float spotAlfa = dot(fromLightDir, normalize(light.conedir));
 
     vec4 color = vec4(0, 0, 0, 0);
-
     if (spotAlfa > light.cutoff) {
         color = calcPointLight(light.pl, position, normal);
         color *= (1.0 - (1.0 - spotAlfa)/(1.0 - light.cutoff));

@@ -31,10 +31,6 @@ public class FlowParticleEmitter implements IParticleEmitter {
     }
 
     public void update(long elapsedTime) {
-        long now = System.currentTimeMillis();
-        if (lastCreationTime == 0) {
-            lastCreationTime = now;
-        }
         Iterator<? extends GameItem> it = particles.iterator();
         while (it.hasNext()) {
             Particle particle = (Particle) it.next();
@@ -45,11 +41,26 @@ public class FlowParticleEmitter implements IParticleEmitter {
             }
         }
 
+        long now = System.currentTimeMillis();
+        if (lastCreationTime == 0) {
+            lastCreationTime = now;
+        }
+
         int length = this.getParticles().size();
         if (now - lastCreationTime >= this.creationPeriodMillis && length < maxParticles) {
             createParticle();
             this.lastCreationTime = now;
         }
+    }
+
+    private void updatePosition(Particle particle, long elapsedTime) {
+        Vector3f speed = particle.getSpeed();
+        float delta = elapsedTime / 1000.0f;
+        float dx = speed.x * delta;
+        float dy = speed.y * delta;
+        float dz = speed.z * delta;
+        Vector3f pos = particle.getPosition();
+        particle.movePosition(dx, dy, dz);
     }
 
     private void createParticle() {
@@ -66,21 +77,4 @@ public class FlowParticleEmitter implements IParticleEmitter {
 
         particles.add(particle);
     }
-
-    public void updatePosition(Particle particle, long elapsedTime) {
-        Vector3f speed = particle.getSpeed();
-        float delta = elapsedTime / 1000.0f;
-        float dx = speed.x * delta;
-        float dy = speed.y * delta;
-        float dz = speed.z * delta;
-        Vector3f pos = particle.getPosition();
-        particle.setPosition(pos.x + dx, pos.y + dy, pos.z + dz);
-    }
-
-//    @Override
-//    public void cleanup() {
-//        for (GameItem particle : getParticles()) {
-//            particle.cleanup();
-//        }
-//    }
 }

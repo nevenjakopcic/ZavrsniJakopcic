@@ -16,7 +16,7 @@ public class Timer {
 
     public float getElapsedTime() {
         double time = getTime();
-        float elapsedTime = (float) (time - lastLoopTime); // TODO: could this be a double?
+        float elapsedTime = (float) (time - lastLoopTime);
         lastLoopTime = time;
         return elapsedTime;
     }

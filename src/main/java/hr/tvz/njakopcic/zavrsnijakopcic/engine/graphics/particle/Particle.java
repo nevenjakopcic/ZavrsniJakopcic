@@ -13,7 +13,7 @@ public class Particle extends GameItem {
     @Getter @Setter private long updateTextureMillis;
     @Getter @Setter private Vector3f speed;
     @Getter @Setter private long lifespan;
-    @Getter         private int animFrames;
+    @Getter         private final int animFrames;
 
     public Particle(Mesh mesh, Vector3f speed, long lifespan, long updateTextureMillis) {
         super(mesh);

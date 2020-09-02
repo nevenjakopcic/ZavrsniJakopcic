@@ -8,9 +8,8 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            boolean vSync = true;
             IGameLogic gameLogic = new SpaceGame();
-            GameEngine gameEngine = new GameEngine("ZavrsniJakopcic", 1024, 576, vSync, gameLogic);
+            GameEngine gameEngine = new GameEngine("ZavrsniJakopcic", 1024, 576, true, gameLogic);
             gameEngine.run();
         } catch (Exception e) {
             e.printStackTrace(System.err);

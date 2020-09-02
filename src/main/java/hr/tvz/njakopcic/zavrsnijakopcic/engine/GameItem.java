@@ -13,8 +13,8 @@ public class GameItem {
 
     @Getter @Setter private Mesh mesh;
     @Getter         private final Vector3f position;
-    @Getter @Setter private float scale;
     @Getter         private final Vector3f rotation;
+    @Getter @Setter private float scale;
     @Getter @Setter private int texturePos;
 
     public GameItem() {
